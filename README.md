@@ -1,6 +1,6 @@
 ---
 
-# json_to_csv
+# j2c
 
 A command-line tool to convert JSON files to CSV with the same filename.
 
@@ -10,8 +10,8 @@ A command-line tool to convert JSON files to CSV with the same filename.
 
 2. **Clone this Repository**:
     ```bash
-    git clone https://github.com/yourusername/json_to_csv.git
-    cd json_to_csv
+    git clone https://github.com/yourusername/j2c.git
+    cd j2c
     ```
 
 3. **Build and Install the Package**:
@@ -27,7 +27,7 @@ A command-line tool to convert JSON files to CSV with the same filename.
 
 To see the help message explaining how to use the script, run:
 ```bash
-python json_to_csv.py --help
+python j2c.py --help
 ```
 This will display the help message.
 
@@ -35,37 +35,21 @@ This will display the help message.
 
 Specify the path to your JSON file using the `--json-file` option.
 ```bash
-python json_to_csv.py --json-file input.json
+python j2c.py --json-file input.json
 ```
 
 This will convert `input.json` to a CSV output file named `input.csv`.
-
-## Example Usage
-
-- **Get Help**:
-  To display the help message explaining how to use the script, run:
-    ```bash
-    python json_to_csv.py --help
-    ```
-
-- **Specify JSON File and Run Conversion**:
-  Specify the path to your JSON file using the `--json-file` option.
-    ```bash
-    python json_to_csv.py --json-file input.json
-    ```
-  
-  This will convert `input.json` to a CSV output file named `input.csv`.
 
 ## Example
 
 1. **Get Help:**
    ```bash
-   python json_to_csv.py --help
+   python j2c.py --help
    ```
 
 2. **Specify JSON File and Run Conversion**:
     ```bash
-    python json_to_csv.py --json-file input.json
+    python j2c.py --json-file input.json
     ```
     
   This will convert `input.json` to `input.csv`.
