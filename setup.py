@@ -10,7 +10,7 @@ with open('LICENSE', 'r') as license_file:
 
 setuptools.setup(
     name='j2c',
-    version='1.0.2',
+    version='1.1.2',
     description='A command-line tool to convert JSON to CSV with the same filename.',
     long_description=long_description,
     long_description_content_type='text/markdown',  # Specify that the README is in Markdown
