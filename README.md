@@ -1,5 +1,3 @@
-Certainly! Here's a more polished version of your README:
-
 ---
 
 # json_to_csv
