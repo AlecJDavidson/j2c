@@ -26,7 +26,18 @@ def ensure_list_of_dicts(data):
     else:
         return data
 
-def json_to_csv(json_file_path, csv_file_path):
+def format_value(value, formatter=None):
+    if formatter and callable(formatter):
+        value = formatter(value)
+    elif isinstance(value, datetime):
+        value = value.isoformat()
+    elif isinstance(value, list):
+        # Decide whether to join the list into a string or keep it as JSON
+        # For now, let's join the list into a string with comma separation
+        value = ', '.join(map(str, value))
+    return str(value)
+
+def json_to_csv(json_file_path, csv_file_path, delimiter=',', custom_formatters=None):
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
     data = ensure_list_of_dicts(data)
@@ -40,30 +51,54 @@ def json_to_csv(json_file_path, csv_file_path):
         headers.update(item.keys())
     
     with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
-        csv_writer = csv.DictWriter(csv_file, fieldnames=sorted(headers), quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writeheader()
+        writer = csv.DictWriter(
+            csv_file,
+            fieldnames=headers,
+            delimiter=delimiter,
+            quoting=csv.QUOTE_MINIMAL
+        )
+        writer.writeheader()
         
-        for item in flattened_data:
-            # Flatten and convert datetime objects to strings
-            flat_item = flatten(item)
-            for key, value in flat_item.items():
-                if isinstance(value, datetime):
-                    flat_item[key] = value.isoformat()
-            csv_writer.writerow(flat_item)
+        for flat_item in flattened_data:
+            formatted_flat_item = {k: format_value(v, custom_formatters.get(k)) for k, v in flat_item.items()}
+            writer.writerow(formatted_flat_item)
 
 def main():
     parser = argparse.ArgumentParser(description="Convert JSON to CSV")
     parser.add_argument('--json-file', type=str, required=True,
                         help='Path to the input JSON file')
+    parser.add_argument('--csv-file', type=str, default=None,
+                        help='Path to the output CSV file (default: same as JSON but with .csv extension)')
+    parser.add_argument('--delimiter', type=str, default=',',
+                        help='CSV delimiter (default: comma)')
+    parser.add_argument('--array-as-string', action='store_true',
+                        help='Keep arrays as JSON strings instead of joining them into a string')
+    parser.add_argument('--custom-formatter', nargs='+',
+                        help='Specify custom formatters for specific fields (e.g., --custom-formatter "field:formatter_function")')
+
     args = parser.parse_args()
+
     json_file_path = args.json_file
-    base_name = os.path.splitext(os.path.basename(json_file_path))[0]
-    csv_file_path = f"{base_name}.csv"
-    try:
-        json_to_csv(json_file_path, csv_file_path)
-        print(f"JSON data has been successfully converted to {csv_file_path}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    csv_file_path = args.csv_file or os.path.splitext(json_file_path)[0] + '.csv'
+    delimiter = args.delimiter
+
+    # Decide how to handle arrays based on the --array-as-string flag
+    if args.array_as_string:
+        custom_formatters = {'list': lambda x: json.dumps(x)}
+    else:
+        custom_formatters = {}
+
+    # Parse custom formatters from command line arguments
+    custom_formatters = {}
+    for formatter in args.custom_formatter or []:
+        field, func_str = formatter.split(':')
+        if field and func_str:
+            try:
+                custom_formatters[field] = lambda x: eval(func_str)
+            except Exception as e:
+                print(f"Invalid custom formatter {formatter}: {e}")
+
+    json_to_csv(json_file_path, csv_file_path, delimiter=delimiter, custom_formatters=custom_formatters)
 
 if __name__ == "__main__":
     main()
