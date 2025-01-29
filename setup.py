@@ -9,7 +9,7 @@ with open('LICENSE', 'r') as license_file:
     license_content = license_file.read()
 
 setuptools.setup(
-    name='json_to_csv',
+    name='j2c',
     version='1.0.0',
     description='A command-line tool to convert JSON to CSV with the same filename.',
     long_description=long_description,
